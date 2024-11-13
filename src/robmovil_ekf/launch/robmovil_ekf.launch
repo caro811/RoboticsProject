@@ -1,0 +1,39 @@
+<launch>
+  <arg name="debug" default="true"/>
+  <arg name="detector" default="true"/>
+
+  <env name="ROSCONSOLE_CONFIG_FILE" value="$(find robmovil_ekf)/launch/rosconsole.conf" if="$(arg debug)"/>
+
+  <!-- Set use_sim_time true for datasets-->
+  <param name="use_sim_time" value="true"/>
+
+  <!-- Run clock publisher-->
+  <node pkg="vrep_util" type="clock_publisher" name="clock_publisher" output="screen" />
+
+  <!-- Run keyboard input interface-->
+  <!-- include file="$(find universal_teleop)/launch/vrep_robot_irm.launch" / -->
+
+  <group if="$(arg detector)">
+      <node pkg="laser" type="landmark_detector" name="landmark_detector" output="screen">
+        <param name="publish_robot_frame" value="base_link_ekf"/>
+      </node>
+
+      <node pkg="laser" type="landmark_detector" name="landmark_detector_gt" output="screen">
+        <param name="publish_robot_frame" value="base_link_gt"/>
+        <remap from="/landmarks_pointcloud" to="/landmarks_pointcloud/groundtruth"/>
+        <remap from="/landmarks" to="/landmarks/groundtruth"/>
+      </node>
+  </group>
+
+  <node pkg="odom" type="robot_odometry" name="robot_odometry" output="screen"/>
+
+  <!---->
+  <!-- Sin lazo cerrado -->
+  <!---->
+
+  <node pkg="robmovil_ekf" type="localizer" name="localizer" output="screen" >
+    <param name="only_prediction" type="bool" value="false"/>
+  </node>
+
+  <node pkg="robmovil_ekf" type="loggerEKF" name="loggerEKF" output="log" />
+</launch>

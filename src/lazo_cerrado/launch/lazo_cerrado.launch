@@ -1,0 +1,36 @@
+<launch>
+
+  <!-- get clock from vrep simulation -->
+  <param name="use_sim_time" value="true"/>
+  <node pkg="vrep_util" type="clock_publisher" name="vrep_clock" output="screen" />
+
+  <node pkg="odom" type="robot_odometry" name="robot_odometry" output="screen" >
+    <param name="print_wheels_expected_speeds" type="bool" value="false"/>
+    <param name="print_wheels_real_speeds" type="bool" value="false"/>
+    <param name="print_robot_real_speeds" type="bool" value="true"/>
+  </node>
+
+  <node pkg="lazo_abierto" type="trajectory_generator" name="trajectory_generator" output="screen" >
+    <!-- configuration parameters while on "square" trajectory type -->
+    <param name="total_points" type="int" value="17"/>
+    <param name="stepping" type="double" value="0.5"/>
+  </node>
+
+  <node pkg="lazo_cerrado" type="closed_trajectory_follower" name="closed_trajectory_follower" output="screen" >
+    <param name="print_trajectory_follow_info" type="bool" value="true"/>
+
+    <!-- NOTA:  -->
+    <!-- 0 < K1 -->
+    <!-- 0 < K2 -->
+    <!-- 0 < K3 -->
+    <param name="K1" type="double" value="1"/>
+    <param name="K2" type="double" value="1"/>
+    <param name="K3" type="double" value="1"/>
+
+    <param name="LOOKAHEAD" type="double" value="0.1"/>
+
+    <param name="EKF" type="bool" value="false"/>
+  </node>
+
+  <node pkg="lazo_cerrado" type="logger" name="logger" output="log" />
+</launch>

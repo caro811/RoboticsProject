@@ -1,0 +1,17 @@
+<launch>
+
+  <!-- get clock from vrep simulation -->
+  <param name="use_sim_time" value="true"/>
+  <node pkg="vrep_util" type="clock_publisher" name="vrep_clock" output="screen" />
+
+  <!-- teleop -->
+  <!-- include file="$(find universal_teleop)/launch/vrep_robot_irm.launch" / -->
+
+  <node pkg="odom" type="robot_odometry" name="robot_odometry" output="screen" >
+    <param name="print_wheels_expected_speeds" type="bool" value="true"/>
+    <param name="print_wheels_real_speeds" type="bool" value="true"/>
+    <param name="print_robot_real_speeds" type="bool" value="true"/>
+  </node>
+
+  <node pkg="odom" type="loggerOdom" name="loggerOdom" output="log" />
+</launch>

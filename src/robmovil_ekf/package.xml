@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package>
+  <name>robmovil_ekf</name>
+  <version>0.0.0</version>
+  <description>The robmovil_ekf package</description>
+  <maintainer email="v01d@todo.todo">v01d</maintainer>
+  <license>TODO</license>
+
+  <buildtool_depend>catkin</buildtool_depend>  
+  <build_depend>roscpp</build_depend>
+  <build_depend>robmovil_msgs</build_depend>
+  <build_depend>lazo_cerrado</build_depend>
+  <build_depend>laser</build_depend>
+  <build_depend>kfilter</build_depend>
+
+  <run_depend>roscpp</run_depend>
+  <run_depend>laser</run_depend>
+  <run_depend>lazo_cerrado</run_depend>
+</package>

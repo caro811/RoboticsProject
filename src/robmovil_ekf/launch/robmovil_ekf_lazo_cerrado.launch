@@ -1,0 +1,64 @@
+<launch>
+  <arg name="debug" default="true"/>
+  <arg name="detector" default="true"/>
+
+  <env name="ROSCONSOLE_CONFIG_FILE" value="$(find robmovil_ekf)/launch/rosconsole.conf" if="$(arg debug)"/>
+
+  <!-- Set use_sim_time true for datasets-->
+  <param name="use_sim_time" value="true"/>
+
+  <!-- Run clock publisher-->
+  <node pkg="vrep_util" type="clock_publisher" name="clock_publisher" output="screen" />
+
+  <group if="$(arg detector)">
+      <node pkg="laser" type="landmark_detector" name="landmark_detector" output="screen">
+        <param name="print_laser_info" type="bool" value="false"/>
+        <param name="publish_robot_frame" value="base_link_ekf"/>
+      </node>
+
+      <node pkg="laser" type="landmark_detector" name="landmark_detector_gt" output="screen">
+        <param name="print_laser_info" type="bool" value="false"/>
+        <param name="publish_robot_frame" value="base_link_gt"/>
+        <remap from="/landmarks_pointcloud" to="/landmarks_pointcloud/groundtruth"/>
+        <remap from="/landmarks" to="/landmarks/groundtruth"/>
+      </node>
+  </group>
+
+  <node pkg="odom" type="robot_odometry" name="robot_odometry" output="screen" >
+    <param name="print_wheels_expected_speeds" type="bool" value="false"/>
+    <param name="print_wheels_real_speeds" type="bool" value="false"/>
+    <param name="print_robot_real_speeds" type="bool" value="false"/>
+  </node>
+
+  <!---->
+      <node pkg="lazo_abierto" type="trajectory_generator" name="trajectory_generator" output="screen" >
+        <!-- configuration parameters while on "square" trajectory type -->
+        <param name="total_points" type="int" value="17"/>
+        <param name="stepping" type="double" value="0.5"/>
+      </node>
+
+      <node pkg="lazo_cerrado" type="closed_trajectory_follower" name="closed_trajectory_follower" output="screen" >
+        <param name="print_trajectory_follow_info" type="bool" value="false"/>
+
+        <!-- NOTA:  -->
+        <!-- 0 < K1 -->
+        <!-- 0 < K2 -->
+        <!-- 0 < K3 -->
+        <param name="K1" type="double" value="2"/>
+        <param name="K2" type="double" value="2"/>
+        <param name="K3" type="double" value="2"/>
+
+        <param name="LOOKAHEAD" type="double" value="0.1"/>
+
+        <param name="EKF" type="bool" value="true"/>
+      </node>
+  <!---->
+
+  <node pkg="robmovil_ekf" type="localizer" name="localizer" output="screen" >
+    <param name="print_localizer_info" type="bool" value="true"/>
+    <param name="only_prediction" type="bool" value="false"/>
+  </node>
+
+  <node pkg="robmovil_ekf" type="loggerEKF" name="loggerEKF" output="log" />
+</launch>
+

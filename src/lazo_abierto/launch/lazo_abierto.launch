@@ -1,0 +1,26 @@
+<launch>
+
+  <!-- get clock from vrep simulation -->
+  <param name="use_sim_time" value="true"/>
+  <node pkg="vrep_util" type="clock_publisher" name="vrep_clock" output="screen" />
+
+  <node pkg="odom" type="robot_odometry" name="robot_odometry" output="screen" >
+    <param name="print_wheels_expected_speeds" type="bool" value="false"/>
+    <param name="print_wheels_real_speeds" type="bool" value="false"/>
+    <param name="print_robot_real_speeds" type="bool" value="false"/>
+  </node>
+  
+  <node pkg="lazo_abierto" type="trajectory_generator" name="trajectory_generator" output="screen" >
+
+    <param name="print_trajectory" type="bool" value="true"/>
+
+    <!-- configuration parameters while on "square" trajectory type -->
+    <param name="total_points" type="int" value="17"/>
+    <param name="total_time" type="double" value="100"/>
+    <param name="stepping" type="double" value="0.5"/>
+
+  </node>
+
+  <node pkg="lazo_abierto" type="trajectory_follower" name="trajectory_follower" output="screen" />
+
+</launch>
